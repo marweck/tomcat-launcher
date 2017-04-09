@@ -2,8 +2,8 @@ Example: Embedded Tomcat w/ Servlet 3.1 and Annotation
 =====================================================
 
 This is a maven project setup as a WAR packaging, with a Main class that
-is responsible to call the TomcatLauncher class. The embedded tomcat created
-by the Main class, runs at the root context on port 8081.
+is responsible to instantiate and call a TomcatLauncher object. The embedded tomcat
+created by the Main class, runs at the root context on port 8081.
 
 Quick Start
 -----------

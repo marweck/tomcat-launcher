@@ -20,7 +20,10 @@ Just  create a Java class with a main method with the following code:
         }
     }
 
-Open your web browser to
+In this case, you creating an Embedded Tomcat 7 on port 8080 and with the 
+context /app.
+
+To access the running app, open your web browser to
 
     http://localhost:8080/app
 
