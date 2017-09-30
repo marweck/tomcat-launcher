@@ -1,11 +1,5 @@
 package com.github.marweck.tomcat.launcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import javax.servlet.ServletException;
-
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -20,6 +14,11 @@ import org.apache.catalina.startup.Tomcat.FixContextListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.VirtualDirContext;
+
+import javax.servlet.ServletException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * Embedded Tomcat Launcher
@@ -108,9 +107,14 @@ public class TomcatLauncher {
 	 */
 	public void launch() throws Exception {
 
-		long start = System.currentTimeMillis();
-
 		printBanner(System.out);
+
+		if (!PortUtil.available(port)) {
+		    log.error("\n\n >>>>>>>>>> BOOOOOOOOM!!! Port already in use... <<<<<<<<<<\n\n");
+		    return;
+        }
+
+		long start = System.currentTimeMillis();
 
 		Tomcat tomcat = startServer();
 
