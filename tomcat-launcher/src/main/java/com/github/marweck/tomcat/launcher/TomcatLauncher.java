@@ -22,9 +22,9 @@ import java.io.PrintStream;
 
 /**
  * Embedded Tomcat Launcher
- *
+ * <p>
  * Usage:
- *
+ * <p>
  * <pre>
  * public static void main(String[] args) throws Exception {
  * 	new TomcatLauncher(8080, "app").launch();
@@ -32,245 +32,231 @@ import java.io.PrintStream;
  * </pre>
  *
  * @author Marcio Carvalho
- *
  */
 public class TomcatLauncher {
 
-	/**
-	 * JULI logger
-	 */
-	private static final Log log = LogFactory.getLog(TomcatLauncher.class);
+    /**
+     * JULI logger
+     */
+    private static final Log log = LogFactory.getLog(TomcatLauncher.class);
 
-	/**
-	 * NIO protocol handler
-	 */
-	private static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
+    /**
+     * NIO protocol handler
+     */
+    private static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
 
-	/**
-	 * Application context name
-	 */
-	private String appContext;
+    /**
+     * Application context name
+     */
+    private String appContext;
 
-	/**
-	 * Connector port
-	 */
-	private int port;
+    /**
+     * Connector port
+     */
+    private int port;
 
-	/**
-	 * Full constructor
-	 *
-	 * @param port
-	 *            Default 8080
-	 * @param appContext
-	 *            Application web context name. To define the root context, null
-	 *            must be used
-	 */
-	public TomcatLauncher(Integer port, String appContext) {
+    /**
+     * Full constructor
+     *
+     * @param port       Default 8080
+     * @param appContext Application web context name. To define the root context, null
+     *                   must be used
+     */
+    public TomcatLauncher(Integer port, String appContext) {
 
-		this.port = port;
+        this.port = port;
 
-		if (port == null) {
-			this.port = 8080;
-		}
-
-		this.appContext = appContext;
-
-		if (appContext == null) {
-			this.appContext = "";
-		} else if (!appContext.startsWith("/")) {
-			this.appContext = "/" + appContext;
-		}
-	}
-
-	/**
-	 * Constructor taking just the port. The application context name will be
-	 * the root.
-	 *
-	 * @param port
-	 */
-	public TomcatLauncher(Integer port) {
-		this(port, null);
-	}
-
-	/**
-	 * Default constructor: port equals to 8080 and root context
-	 */
-	public TomcatLauncher() {
-		this(8080);
-	}
-
-	/**
-	 * Configures and starts the embedded Tomcat. When returned, the tomcat will
-	 * have stopped.
-	 *
-	 * @throws Exception
-	 */
-	public void launch() throws Exception {
-
-		printBanner(System.out);
-
-		if (!PortUtil.available(port)) {
-		    log.error("\n\n >>>>>>>>>> BOOOOOOOOM!!! Port already in use... <<<<<<<<<<\n\n");
-		    return;
+        if (port == null) {
+            this.port = 8080;
         }
 
-		long start = System.currentTimeMillis();
+        this.appContext = appContext;
 
-		Tomcat tomcat = startServer();
+        if (appContext == null) {
+            this.appContext = "";
+        } else if (!appContext.startsWith("/")) {
+            this.appContext = "/" + appContext;
+        }
+    }
 
-		log.info("Server started in " + (System.currentTimeMillis() - start) + "ms");
+    /**
+     * Constructor taking just the port. The application context name will be
+     * the root.
+     *
+     * @param port
+     */
+    public TomcatLauncher(Integer port) {
+        this(port, null);
+    }
 
-		tomcat.getServer().await();
-	}
+    /**
+     * Default constructor: port equals to 8080 and root context
+     */
+    public TomcatLauncher() {
+        this(8080);
+    }
 
-	/**
-	 * Creates and starts the Tomcat server instance
-	 *
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws LifecycleException
-	 */
-	private Tomcat startServer() throws IOException, ServletException, LifecycleException {
+    /**
+     * Configures and starts the embedded Tomcat. When returned, the tomcat will
+     * have stopped.
+     *
+     * @throws Exception
+     */
+    public void launch() throws Exception {
 
-		initEnvironmentVariables();
+        Banner.printBanner(System.out);
 
-		Tomcat tomcat = new Tomcat();
+        if (!PortUtil.available(port)) {
+            log.error(Banner.redText("\n\n >>>>>>>>>> BOOOOOOOOM!!! Port already in use... <<<<<<<<<<\n\n"));
+            return;
+        }
 
-		tomcat.setBaseDir(PathUtil.createTempDir("tomcat-base-dir", Integer.toString(port)).toString());
-		tomcat.setPort(port);
-		tomcat.setSilent(true);
-		tomcat.enableNaming();
+        long start = System.currentTimeMillis();
 
-		prepareContext(tomcat);
-		prepareConnector(tomcat);
+        Tomcat tomcat = startServer();
 
-		tomcat.start();
+        log.info(Banner.blueText("Server localhost:" + port + appContext + " started in " +
+                (System.currentTimeMillis() - start) + "ms"));
 
-		return tomcat;
-	}
+        tomcat.getServer().await();
+    }
 
-	/**
-	 * Creates and prepares the application context.
-	 *
-	 * @param tomcat
-	 * @return
-	 * @throws ServletException
-	 */
-	private StandardContext prepareContext(Tomcat tomcat) throws ServletException {
+    /**
+     * Creates and starts the Tomcat server instance
+     *
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws LifecycleException
+     */
+    private Tomcat startServer() throws IOException, ServletException, LifecycleException {
 
-		Host host = tomcat.getHost();
-		StandardContext context = new StandardContext();
+        initEnvironmentVariables();
 
-		context.setName(appContext);
-		context.setPath(appContext);
+        Tomcat tomcat = new Tomcat();
 
-		File documentBase = PathUtil.getDocumentBase();
-		context.setDocBase(documentBase.getAbsolutePath());
-		context.setParentClassLoader(getClass().getClassLoader());
-		context.setConfigFile(PathUtil.getWebappConfigFile(documentBase));
+        tomcat.setBaseDir(PathUtil.createTempDir("tomcat-base-dir", Integer.toString(port)).toString());
+        tomcat.setPort(port);
+        tomcat.setSilent(true);
+        tomcat.enableNaming();
 
-		context.addLifecycleListener(new DefaultWebXmlListener());
-		context.addLifecycleListener(createLifecycleListener(host));
-		context.addLifecycleListener(new FixContextListener());
+        prepareContext(tomcat);
+        prepareConnector(tomcat);
 
-		// target/classes if existent
-		addAlternativeResources(context);
+        tomcat.start();
 
-		WebappLoader loader = new WebappLoader(context.getParentClassLoader());
-		loader.setDelegate(true);
-		context.setLoader(loader);
+        return tomcat;
+    }
 
-		host.addChild(context);
+    /**
+     * Creates and prepares the application context.
+     *
+     * @param tomcat
+     * @return
+     * @throws ServletException
+     */
+    private StandardContext prepareContext(Tomcat tomcat) throws ServletException {
 
-		return context;
-	}
+        Host host = tomcat.getHost();
+        StandardContext context = new StandardContext();
 
-	/**
-	 * Creates and configures the server connector.
-	 *
-	 * This connector uses compression by default for every text file (html, js,
-	 * xml, css, json) with size greater than 4KB.
-	 *
-	 * @param tomcat
-	 * @return
-	 */
-	private Connector prepareConnector(Tomcat tomcat) {
+        context.setName(appContext);
+        context.setPath(appContext);
 
-		Connector connector = new Connector(DEFAULT_PROTOCOL);
+        File documentBase = PathUtil.getDocumentBase();
+        context.setDocBase(documentBase.getAbsolutePath());
+        context.setParentClassLoader(getClass().getClassLoader());
+        context.setConfigFile(PathUtil.getWebappConfigFile(documentBase));
 
-		connector.setPort(port);
-		connector.setURIEncoding("UTF-8");
-		connector.setProperty("bindOnInit", "false");
-		connector.setProperty("compression", "on");
-		connector.setProperty("compressionMinSize", "4096");
-		connector.setProperty("noCompressionUserAgents", "gozilla, traviata");
-		connector.setProperty("compressableMimeType",
-				"text/html,text/xml,text/css,application/json,application/javascript");
+        context.addLifecycleListener(new DefaultWebXmlListener());
+        context.addLifecycleListener(createLifecycleListener(host));
+        context.addLifecycleListener(new FixContextListener());
 
-		tomcat.getService().addConnector(connector);
-		tomcat.setConnector(connector);
+        // target/classes if existent
+        addAlternativeResources(context);
 
-		return connector;
-	}
+        WebappLoader loader = new WebappLoader(context.getParentClassLoader());
+        loader.setDelegate(true);
+        context.setLoader(loader);
 
-	/**
-	 * Adds target/classes, if it exists, as an alternative resource dir. This
-	 * is specially useful when executing the application inside an IDE.
-	 *
-	 * @param context
-	 *            server context
-	 */
-	private void addAlternativeResources(StandardContext context) {
-		File alternative = new File("target/classes");
+        host.addChild(context);
 
-		if (alternative.exists()) {
-			VirtualDirContext resources = new VirtualDirContext();
-			resources.setExtraResourcePaths("/WEB-INF/classes=" + alternative.getAbsolutePath());
-			context.setResources(resources);
-		}
-	}
+        return context;
+    }
 
-	/**
-	 * Instantiates the the approppriate lifecycle listener for the host
-	 *
-	 * @param host
-	 * @return
-	 */
-	private LifecycleListener createLifecycleListener(Host host) {
+    /**
+     * Creates and configures the server connector.
+     * <p>
+     * This connector uses compression by default for every text file (html, js,
+     * xml, css, json) with size greater than 4KB.
+     *
+     * @param tomcat
+     * @return
+     */
+    private Connector prepareConnector(Tomcat tomcat) {
 
-		LifecycleListener listener = null;
+        Connector connector = new Connector(DEFAULT_PROTOCOL);
 
-		try {
-			Class<?> clazz = Class.forName(host.getConfigClass());
-			listener = (LifecycleListener) clazz.newInstance();
+        connector.setPort(port);
+        connector.setURIEncoding("UTF-8");
+        connector.setProperty("bindOnInit", "false");
+        connector.setProperty("compression", "on");
+        connector.setProperty("compressionMinSize", "4096");
+        connector.setProperty("noCompressionUserAgents", "gozilla, traviata");
+        connector.setProperty("compressableMimeType",
+                "text/html,text/xml,text/css,application/json,application/javascript");
 
-			if (listener instanceof ContextConfig) {
-				((ContextConfig) listener).setDefaultWebXml(Constants.NoDefaultWebXml);
-			}
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
+        tomcat.getService().addConnector(connector);
+        tomcat.setConnector(connector);
 
-		return listener;
-	}
+        return connector;
+    }
 
-	/**
-	 * Setting some system properties important for JSF applications
-	 */
-	private void initEnvironmentVariables() {
-		System.setProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE", "true");
-		System.setProperty("org.apache.el.parser.COERCE_TO_ZERO", "false");
-	}
+    /**
+     * Adds target/classes, if it exists, as an alternative resource dir. This
+     * is specially useful when executing the application inside an IDE.
+     *
+     * @param context server context
+     */
+    private void addAlternativeResources(StandardContext context) {
+        File alternative = new File("target/classes");
 
-	/**
-	 * Prints a friendly Tomcat banner on the print stream
-	 *
-	 * @param out
-	 */
-	private void printBanner(PrintStream out) {
-		for (String line : Banner.BANNER_LINES) {
-			out.println(line);
-		}
-	}
+        if (alternative.exists()) {
+            VirtualDirContext resources = new VirtualDirContext();
+            resources.setExtraResourcePaths("/WEB-INF/classes=" + alternative.getAbsolutePath());
+            context.setResources(resources);
+        }
+    }
+
+    /**
+     * Instantiates the the approppriate lifecycle listener for the host
+     *
+     * @param host
+     * @return
+     */
+    private LifecycleListener createLifecycleListener(Host host) {
+
+        LifecycleListener listener = null;
+
+        try {
+            Class<?> clazz = Class.forName(host.getConfigClass());
+            listener = (LifecycleListener) clazz.newInstance();
+
+            if (listener instanceof ContextConfig) {
+                ((ContextConfig) listener).setDefaultWebXml(Constants.NoDefaultWebXml);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        return listener;
+    }
+
+    /**
+     * Setting some system properties important for JSF applications
+     */
+    private void initEnvironmentVariables() {
+        System.setProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE", "true");
+        System.setProperty("org.apache.el.parser.COERCE_TO_ZERO", "false");
+    }
 }
