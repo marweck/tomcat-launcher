@@ -258,5 +258,6 @@ public class TomcatLauncher {
     private void initEnvironmentVariables() {
         System.setProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE", "true");
         System.setProperty("org.apache.el.parser.COERCE_TO_ZERO", "false");
+        System.setProperty("file.encoding", "UTF-8");
     }
 }
