@@ -10,7 +10,7 @@ import java.net.ServerSocket;
 public class PortUtil {
 
     /**
-     * Checks to see if a specific port is available.
+     * Checks whether a specific port is available.
      *
      * @param port the port to check for availability
      */

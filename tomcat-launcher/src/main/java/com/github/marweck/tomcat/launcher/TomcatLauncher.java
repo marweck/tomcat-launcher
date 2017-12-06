@@ -18,7 +18,6 @@ import org.apache.naming.resources.VirtualDirContext;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * Embedded Tomcat Launcher
@@ -257,7 +256,7 @@ public final class TomcatLauncher {
      */
     private LifecycleListener createLifecycleListener(Host host) {
 
-        LifecycleListener listener = null;
+        LifecycleListener listener;
 
         try {
             Class<?> clazz = Class.forName(host.getConfigClass());
