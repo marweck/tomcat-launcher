@@ -33,7 +33,7 @@ import java.io.PrintStream;
  *
  * @author Marcio Carvalho
  */
-public class TomcatLauncher {
+public final class TomcatLauncher {
 
     /**
      * JULI logger
@@ -48,49 +48,67 @@ public class TomcatLauncher {
     /**
      * Application context name
      */
-    private String appContext;
+    private final String appContext;
 
     /**
      * Connector port
      */
-    private int port;
+    private final int port;
+
+    /**
+     * Determines whether http compression must be enabled
+     */
+    private final boolean compressingEnabled;
 
     /**
      * Full constructor
      *
-     * @param port       Default 8080
-     * @param appContext Application web context name. To define the root context, null
-     *                   must be used
+     * @param port               Default 8080
+     * @param appContext         Application web context name. To define the root context, null
+     *                           must be used
+     * @param compressingEnabled Determines whether http compression must be enabled
      */
-    public TomcatLauncher(Integer port, String appContext) {
-
-        this.port = port;
+    public TomcatLauncher(Integer port, String appContext, boolean compressingEnabled) {
 
         if (port == null) {
             this.port = 8080;
+        } else {
+            this.port = port;
         }
-
-        this.appContext = appContext;
 
         if (appContext == null) {
             this.appContext = "";
         } else if (!appContext.startsWith("/")) {
             this.appContext = "/" + appContext;
+        } else {
+            this.appContext = appContext;
         }
+
+        this.compressingEnabled = compressingEnabled;
+    }
+
+    /**
+     * Constructor taking the port and the appContext. Compression is enabled by default
+     *
+     * @param port       port of the server
+     * @param appContext app context name or null for root
+     */
+    public TomcatLauncher(Integer port, String appContext) {
+        this(port, appContext, true);
     }
 
     /**
      * Constructor taking just the port. The application context name will be
-     * the root.
+     * the root. Compression is enabled by default.
      *
-     * @param port
+     * @param port server port
      */
     public TomcatLauncher(Integer port) {
-        this(port, null);
+        this(port, null, true);
     }
 
     /**
-     * Default constructor: port equals to 8080 and root context
+     * Default constructor: port equals to 8080 and root context. Compression is enabled by default.
      */
     public TomcatLauncher() {
         this(8080);
@@ -200,11 +218,14 @@ public class TomcatLauncher {
         connector.setPort(port);
         connector.setURIEncoding("UTF-8");
         connector.setProperty("bindOnInit", "false");
-        connector.setProperty("compression", "on");
-        connector.setProperty("compressionMinSize", "4096");
-        connector.setProperty("noCompressionUserAgents", "gozilla, traviata");
-        connector.setProperty("compressableMimeType",
-                "text/html,text/xml,text/css,application/json,application/javascript");
+
+        if (compressingEnabled) {
+            connector.setProperty("compression", "on");
+            connector.setProperty("compressionMinSize", "4096");
+            connector.setProperty("noCompressionUserAgents", "gozilla, traviata");
+            connector.setProperty("compressableMimeType",
+                    "text/html,text/xhtml,text/xml,text/css,application/json,application/javascript");
+        }
 
         tomcat.getService().addConnector(connector);
         tomcat.setConnector(connector);

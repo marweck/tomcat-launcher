@@ -33,6 +33,9 @@ public class Banner {
             "\t                                           v 7.0.82                    ",
             ANSI_RESET + "                                                            "};
 
+    /**
+     * Private constructor
+     */
     private Banner() {
     }
 
