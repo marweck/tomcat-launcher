@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>com.github.marweck</groupId>
-      <artifactId>tomcat-launcher</artifactId>
+      <artifactId>tomcat9-launcher</artifactId>
       <version>1.0.0</version>
     </dependency>
   </dependencies>

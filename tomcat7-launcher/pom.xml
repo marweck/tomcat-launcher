@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.marweck</groupId>
-  <artifactId>tomcat-launcher</artifactId>
+  <artifactId>tomcat7-launcher</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
-  <name>tomcat-launcher</name>
+  <name>tomcat7-launcher</name>
 
   <properties>
     <tomcat.version>7.0.91</tomcat.version>
@@ -48,8 +48,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
         </configuration>
       </plugin>
 

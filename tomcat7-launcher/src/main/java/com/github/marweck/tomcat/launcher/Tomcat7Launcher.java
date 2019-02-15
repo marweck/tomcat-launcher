@@ -20,24 +20,24 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Embedded Tomcat Launcher
+ * Embedded Tomcat 7 Launcher
  * <p>
  * Usage:
  * <p>
  * <pre>
  * public static void main(String[] args) throws Exception {
- * 	new TomcatLauncher(8080, "app").launch();
+ * 	new Tomcat7Launcher(8080, "app").launch();
  * }
  * </pre>
  *
  * @author Marcio Carvalho
  */
-public final class TomcatLauncher {
+public final class Tomcat7Launcher {
 
     /**
      * JULI logger
      */
-    private static final Log log = LogFactory.getLog(TomcatLauncher.class);
+    private static final Log log = LogFactory.getLog(Tomcat7Launcher.class);
 
     /**
      * NIO protocol handler
@@ -62,12 +62,15 @@ public final class TomcatLauncher {
     /**
      * Full constructor
      *
-     * @param port               Default 8080
-     * @param appContext         Application web context name. To define the root context, null
-     *                           must be used
-     * @param compressingEnabled Determines whether http compression must be enabled
+     * @param port
+     *         Default 8080
+     * @param appContext
+     *         Application web context name. To define the root context, null
+     *         must be used
+     * @param compressingEnabled
+     *         Determines whether http compression must be enabled
      */
-    public TomcatLauncher(Integer port, String appContext, boolean compressingEnabled) {
+    public Tomcat7Launcher(Integer port, String appContext, boolean compressingEnabled) {
 
         if (port == null) {
             this.port = 8080;
@@ -89,10 +92,12 @@ public final class TomcatLauncher {
     /**
      * Constructor taking the port and the appContext. Compression is enabled by default
      *
-     * @param port       port of the server
-     * @param appContext app context name or null for root
+     * @param port
+     *         port of the server
+     * @param appContext
+     *         app context name or null for root
      */
-    public TomcatLauncher(Integer port, String appContext) {
+    public Tomcat7Launcher(Integer port, String appContext) {
         this(port, appContext, true);
     }
 
@@ -100,16 +105,17 @@ public final class TomcatLauncher {
      * Constructor taking just the port. The application context name will be
      * the root. Compression is enabled by default.
      *
-     * @param port server port
+     * @param port
+     *         server port
      */
-    public TomcatLauncher(Integer port) {
+    public Tomcat7Launcher(Integer port) {
         this(port, null, true);
     }
 
     /**
      * Default constructor: port equals to 8080 and root context. Compression is enabled by default.
      */
-    public TomcatLauncher() {
+    public Tomcat7Launcher() {
         this(8080);
     }
 
@@ -146,7 +152,7 @@ public final class TomcatLauncher {
      * @throws ServletException
      * @throws LifecycleException
      */
-    private Tomcat startServer() throws IOException, ServletException, LifecycleException {
+    private Tomcat startServer() throws ServletException, LifecycleException {
 
         initEnvironmentVariables();
 
@@ -172,7 +178,7 @@ public final class TomcatLauncher {
      * @return
      * @throws ServletException
      */
-    private StandardContext prepareContext(Tomcat tomcat) throws ServletException {
+    private StandardContext prepareContext(Tomcat tomcat) {
 
         Host host = tomcat.getHost();
         StandardContext context = new StandardContext();
@@ -236,7 +242,8 @@ public final class TomcatLauncher {
      * Adds target/classes, if it exists, as an alternative resource dir. This
      * is specially useful when executing the application inside an IDE.
      *
-     * @param context server context
+     * @param context
+     *         server context
      */
     private void addAlternativeResources(StandardContext context) {
         File alternative = new File("target/classes");

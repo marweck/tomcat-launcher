@@ -2,8 +2,9 @@
 .project
 .settings/
 target/
-.idea/
 bin/
 *.swp
 *.log
 .DS_Store
+.idea/
+tomcat-launcher.iml
