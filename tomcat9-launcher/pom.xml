@@ -8,7 +8,7 @@
   <name>tomcat9-launcher</name>
 
   <properties>
-    <tomcat.version>9.0.16</tomcat.version>
+    <tomcat.version>9.0.17</tomcat.version>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
