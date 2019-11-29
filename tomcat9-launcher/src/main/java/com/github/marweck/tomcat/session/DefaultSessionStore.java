@@ -1,5 +1,10 @@
 package com.github.marweck.tomcat.session;
 
-public class DefaultSessionStore {
+/**
+ * NoOp SessionStore
+ * <p>
+ * Defaults to tomcat default session sotre
+ */
+public class DefaultSessionStore implements SessionStore {
 
 }

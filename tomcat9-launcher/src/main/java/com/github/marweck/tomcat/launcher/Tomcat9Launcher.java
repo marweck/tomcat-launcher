@@ -1,5 +1,7 @@
 package com.github.marweck.tomcat.launcher;
 
+import com.github.marweck.tomcat.session.DefaultSessionStore;
+import com.github.marweck.tomcat.session.SessionStore;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -62,6 +64,11 @@ public final class Tomcat9Launcher {
     private final boolean compressingEnabled;
 
     /**
+     * Session store configuration
+     */
+    private final SessionStore sessionStore;
+
+    /**
      * Full constructor
      *
      * @param port
@@ -72,7 +79,8 @@ public final class Tomcat9Launcher {
      * @param compressingEnabled
      *         Determines whether http compression must be enabled
      */
-    public Tomcat9Launcher(Integer port, String appContext, boolean compressingEnabled) {
+    public Tomcat9Launcher(Integer port, String appContext, boolean compressingEnabled,
+                           SessionStore sessionStore) {
 
         if (port == null) {
             this.port = 8080;
@@ -89,6 +97,11 @@ public final class Tomcat9Launcher {
         }
 
         this.compressingEnabled = compressingEnabled;
+        this.sessionStore = sessionStore;
+
+        if (sessionStore == null) {
+            throw new IllegalStateException("Session store is null");
+        }
     }
 
     /**
@@ -100,7 +113,11 @@ public final class Tomcat9Launcher {
      *         app context name or null for root
      */
     public Tomcat9Launcher(Integer port, String appContext) {
-        this(port, appContext, true);
+        this(port, appContext, true, new DefaultSessionStore());
+    }
+
+    public Tomcat9Launcher(Integer port, String appContext, SessionStore sessionStore) {
+        this(port, appContext, true, sessionStore);
     }
 
     /**
@@ -111,7 +128,11 @@ public final class Tomcat9Launcher {
      *         server port
      */
     public Tomcat9Launcher(Integer port) {
-        this(port, null, true);
+        this(port, null, true, new DefaultSessionStore());
+    }
+
+    public Tomcat9Launcher(Integer port, SessionStore sessionStore) {
+        this(port, null, true, sessionStore);
     }
 
     /**
@@ -119,6 +140,10 @@ public final class Tomcat9Launcher {
      */
     public Tomcat9Launcher() {
         this(8080);
+    }
+
+    public Tomcat9Launcher(SessionStore sessionStore) {
+        this(8080, sessionStore);
     }
 
     /**
@@ -187,6 +212,8 @@ public final class Tomcat9Launcher {
 
         context.setName(appContext);
         context.setPath(appContext);
+
+        sessionStore.configureSessionStore(context);
 
         File documentBase = PathUtil.getDocumentBase();
         context.setDocBase(documentBase.getAbsolutePath());

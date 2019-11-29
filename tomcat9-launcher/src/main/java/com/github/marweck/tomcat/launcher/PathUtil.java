@@ -1,5 +1,8 @@
 package com.github.marweck.tomcat.launcher;
 
+import org.apache.catalina.startup.Constants;
+import org.apache.tomcat.util.buf.UriUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -9,9 +12,6 @@ import java.net.URLConnection;
 import java.security.CodeSource;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.apache.catalina.startup.Constants;
-import org.apache.tomcat.util.buf.UriUtil;
 
 /**
  * Utilities related to resources paths
@@ -23,7 +23,7 @@ public class PathUtil {
     /**
      * Most common used document root locations
      */
-    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public", "static"};
+    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public", "static", "webapp"};
 
     /**
      * Private constructor
@@ -63,7 +63,7 @@ public class PathUtil {
      */
     public static File getDocumentBase() {
 
-        File file = getArchiveFileDocumentRoot(".war");
+        File file = getWarFileDocumentRoot();
 
         // If not a war archive maybe it is an exploded war
         file = file != null ? file : getExplodedWarFileDocumentRoot();
@@ -94,6 +94,10 @@ public class PathUtil {
         }
 
         return null;
+    }
+
+    private static File getWarFileDocumentRoot() {
+        return getArchiveFileDocumentRoot(".war");
     }
 
     /**
