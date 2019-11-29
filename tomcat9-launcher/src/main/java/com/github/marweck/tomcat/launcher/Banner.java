@@ -1,6 +1,7 @@
 package com.github.marweck.tomcat.launcher;
 
 import java.io.PrintStream;
+import java.util.Properties;
 
 /**
  * Holds the tomcat banner string.
@@ -17,6 +18,8 @@ public class Banner {
 
     private static final String ANSI_BLUE = "\u001B[34m";
 
+    private static final String TOMCAT_VERSION = tomcatVersion();
+
     /**
      * Friendly Tomcat banner
      */
@@ -28,8 +31,19 @@ public class Banner {
             "\t   ██║   ██║   ██║██║╚██╔╝██║██║     ██╔══██║   ██║       ██╔╝██╔╝     ",
             "\t   ██║   ╚██████╔╝██║ ╚═╝ ██║╚██████╗██║  ██║   ██║      ██╔╝██╔╝      ",
             "\t   ╚═╝    ╚═════╝ ╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝      ╚═╝ ╚═╝       ",
-            "\t                                           v 9.0.29                    ",
+            "\t                                           " + TOMCAT_VERSION,
             ANSI_RESET + "                                                            "};
+
+    private static String tomcatVersion() {
+        try {
+            Properties properties = new Properties();
+            properties.load(Banner.class.getClassLoader().getResourceAsStream("version.properties"));
+
+            return "v " + properties.getProperty("tomcat.version");
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
     /**
      * Private constructor
